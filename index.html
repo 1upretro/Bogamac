@@ -45,7 +45,7 @@
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       background: #0A0E1A;
-      z-index: 9999; /* Por encima de todo */
+      z-index: 9999; 
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -197,17 +197,6 @@
     }
     .corporate-logo { width: 200px; height: auto; object-fit: contain; display: block; }
 
-    /* TOAST */
-    .toast {
-      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
-      padding: 12px 24px; border-radius: 14px; background: rgba(10, 14, 26, 0.85);
-      border: 1px solid var(--accent); color: var(--accent); font-family: 'Rajdhani', sans-serif;
-      font-weight: 600; letter-spacing: 2px; font-size: 15px; opacity: 0; pointer-events: none;
-      transition: opacity 0.3s ease, transform 0.3s ease; backdrop-filter: blur(10px); z-index: 100;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); text-align: center; width: max-content; max-width: 90%;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
     /* ADAPTACIÓN PARA CELULARES EN VERTICAL */
     @media (max-aspect-ratio: 1/1) {
       .topbar { padding: 0 15px; height: 50px; }
@@ -239,7 +228,7 @@
       <div class="loader-text">CARGANDO SISTEMA</div>
     </div>
 
-    <!-- VIDEOS (El primero tiene preload="auto") -->
+    <!-- VIDEOS -->
     <video id="bg-video-1" class="bg-video active" autoplay muted playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4" />
     </video>
@@ -296,7 +285,6 @@
 
     </main>
 
-    <div class="toast" id="toast"></div>
   </div>
 
   <script>
@@ -305,31 +293,26 @@
     const video1 = document.getElementById('bg-video-1');
     const video2 = document.getElementById('bg-video-2');
 
-    // Función para quitar la pantalla de carga
     function hideLoader() {
       loader.classList.add('hidden');
     }
 
-    // Si el video 1 ya tiene suficientes datos descargados (canplaythrough)
     video1.addEventListener('canplaythrough', () => {
-      // Damos un pequeño retraso de 0.5s para que la transición se vea suave
       setTimeout(hideLoader, 500); 
     }, { once: true });
 
-    // Si el video falla por alguna razón, quitamos el loader igual para no bloquear la app
     video1.addEventListener('error', () => {
       hideLoader();
     });
 
 
-    // --- RESTO DE LA LÓGICA DE LA BOTONERA ---
+    // --- LÓGICA DE LA BOTONERA ---
     const FLOORS = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1];
     const FLOOR_LABELS = { 0: 'PB', '-1': 'S1' };
     const grid = document.getElementById('floorsGrid');
     const currentFloorEl = document.getElementById('currentFloor');
     const arrowEl = document.getElementById('directionArrow'); 
     const clockEl = document.getElementById('clock');
-    const toastEl = document.getElementById('toast');
 
     let currentFloor = 1;
     let direction = 'stopped'; 
@@ -346,20 +329,24 @@
 
     function onFloorClick(floor, btn, event) {
       createRipple(btn, event);
-      if (floor === currentFloor) { showToast(`Ya estás en el piso ${labelFor(floor)}`); return; }
+      
+      // Si ya está en ese piso, no hace nada
+      if (floor === currentFloor) return; 
+
       if (selectedFloors.has(floor)) {
-        selectedFloors.delete(floor); btn.classList.remove('selected'); showToast(`Piso ${labelFor(floor)} cancelado`);
+        selectedFloors.delete(floor); 
+        btn.classList.remove('selected'); 
       } else {
-        selectedFloors.add(floor); btn.classList.add('selected'); showToast(`Piso ${labelFor(floor)} solicitado`);
+        selectedFloors.add(floor); 
+        btn.classList.add('selected'); 
       }
       updateArrow(); 
     }
 
+    // Los botones especiales ahora no muestran cartel, solo el efecto visual de presionar
     document.querySelectorAll('.special-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const action = btn.dataset.action;
-        const messages = { open: 'Puertas abriendo...', close: 'Puertas cerrando...', alarm: '¡ALARMA ACTIVADA!' };
-        showToast(messages[action]);
+        // Se puede agregar lógica extra aquí a futuro
       });
     });
 
@@ -377,14 +364,6 @@
       ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
       el.appendChild(ripple);
       setTimeout(() => ripple.remove(), 600);
-    }
-
-    let toastTimeout;
-    function showToast(message) {
-      toastEl.textContent = message;
-      toastEl.classList.add('show');
-      clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => toastEl.classList.remove('show'), 2200);
     }
 
     function labelFor(floor) { return FLOOR_LABELS[floor] ?? floor; }
