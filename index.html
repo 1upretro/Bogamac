@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Botonera Ascensor - Vertical</title>
+  <title>Botonera Ascensor - Bogamac Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -18,11 +18,12 @@
       --btn-bg: rgba(10, 14, 26, 0.45); 
       --btn-border: rgba(255, 255, 255, 0.25);
       --danger: #FF4D6D;
+      --success: #00FFC6;
     }
     
     html, body {
       width: 100%; height: 100%; overflow: hidden;
-      background: #000; /* Fondo negro para simular pantalla vertical en PC */
+      background: #000;
       color: var(--text);
       font-family: 'Space Grotesk', sans-serif;
       user-select: none; -webkit-tap-highlight-color: transparent;
@@ -31,79 +32,104 @@
       align-items: center;
     }
 
-    /* CONTENEDOR VERTICAL */
     .app-container {
       position: relative;
-      width: 100%;
-      height: 100%;
-      max-width: 500px; /* Ancho máximo en PC */
-      max-height: 100vh;
-      aspect-ratio: 9 / 16; 
-      background: #0A0E1A;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
-      box-shadow: 0 0 50px rgba(0,0,0,1);
+      background: #0A0E1A;
     }
 
-    /* VIDEO DE FONDO */
-    #bg-video {
+    /* VIDEOS */
+    .bg-video {
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
       object-fit: cover;
       z-index: 0; 
+      opacity: 0; 
+      transition: opacity 1s ease-in-out; 
     }
+    .bg-video.active { opacity: 1; }
 
     /* BARRA SUPERIOR */
     .topbar {
-      position: absolute; top: 0; left: 0; right: 0; height: 60px; padding: 0 20px;
+      position: absolute; top: 0; left: 0; right: 0; height: 60px; padding: 0 30px;
       display: flex; justify-content: space-between; align-items: center;
       background: linear-gradient(to bottom, rgba(10,14,26,0.9), transparent);
       z-index: 10;
     }
-    .brand { display: flex; align-items: center; gap: 8px; }
-    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
-    .brand-name { font-family: 'Rajdhani', sans-serif; font-weight: 600; letter-spacing: 2px; font-size: 14px; }
-    .status { display: flex; gap: 12px; align-items: center; }
-    .status-item { display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: 1px; color: var(--text); font-family: 'Rajdhani', sans-serif; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-    .pulse { width: 6px; height: 6px; border-radius: 50%; background: #00FFC6; box-shadow: 0 0 10px #00FFC6; animation: pulse 1.6s infinite; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+    .brand-name { font-family: 'Rajdhani', sans-serif; font-weight: 600; letter-spacing: 2px; font-size: 18px; }
+    .status { display: flex; gap: 20px; align-items: center; }
+    .status-item { display: flex; align-items: center; gap: 6px; font-size: 13px; letter-spacing: 1px; color: var(--text); font-family: 'Rajdhani', sans-serif; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 1.6s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
 
     /* PANEL PRINCIPAL */
     .panel {
       position: absolute; top: 60px; left: 0; right: 0; bottom: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
-      padding: 10px 20px 20px; 
+      display: flex; flex-direction: row; align-items: center; justify-content: space-evenly;
+      padding: 20px 40px; 
       z-index: 10;
       pointer-events: none; 
     }
 
-    /* INDICADOR DE PISO */
-    .floor-indicator { display: flex; flex-direction: column; align-items: center; gap: 0px; pointer-events: auto; margin-top: 10px; }
-    .floor-indicator .label { font-family: 'Rajdhani', sans-serif; font-size: 11px; letter-spacing: 3px; color: var(--text); font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-    .current-floor { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 76px; line-height: 1; color: var(--accent); text-shadow: 0 0 30px rgba(0, 229, 255, 0.8), 0 4px 10px rgba(0,0,0,0.8); }
-    .direction { font-family: 'Rajdhani', sans-serif; font-size: 11px; letter-spacing: 2px; color: #00FFC6; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-
-    /* BOTONES DE PISOS */
-    .floors-grid {
-      display: grid; 
-      grid-template-columns: repeat(3, 80px); 
-      gap: 16px; 
-      pointer-events: auto;
-      margin-bottom: 20px; /* Espacio extra para que el logo no los tape */
+    /* SECCIÓN IZQUIERDA: Piso y Flecha */
+    .floor-indicator { 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      pointer-events: auto; width: 30%;
     }
+    .floor-indicator .label { font-family: 'Rajdhani', sans-serif; font-size: 16px; letter-spacing: 6px; color: var(--text-dim); font-weight: 700; margin-bottom: -10px; }
+    .current-floor { 
+      font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 220px; 
+      line-height: 0.9; color: var(--accent); 
+      text-shadow: 0 0 40px rgba(0, 229, 255, 0.9), 0 6px 15px rgba(0,0,0,0.9); 
+      transform-origin: center center; 
+    }
+    .animate-drop { animation: dropAndBounce 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+    @keyframes dropAndBounce {
+      0% { transform: translateY(-500px) scale(1.1); opacity: 0; }
+      30% { transform: translateY(0px) scale(1); opacity: 1; }
+      45% { transform: translateY(-30px) scale(1); }
+      60% { transform: translateY(0px) scale(1); }
+      75% { transform: translateY(-10px) scale(1); }
+      90% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(0px) scale(1); }
+    }
+    .direction-container { height: 80px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
+    .direction-arrow {
+      width: 80px; height: 80px; color: var(--success); 
+      filter: drop-shadow(0 0 15px rgba(0, 255, 198, 0.8));
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+    }
+    .direction-arrow.up { transform: rotate(0deg); animation: bounceUp 1.2s infinite ease-in-out; }
+    .direction-arrow.down { transform: rotate(180deg); animation: bounceDown 1.2s infinite ease-in-out; }
+    .direction-arrow.stopped { animation: none; opacity: 0.15; filter: none; }
+    @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(0deg); } }
+    @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(180deg); } 50% { transform: translateY(15px) rotate(180deg); } }
+
+    /* SECCIÓN CENTRAL: Botones de pisos (SIN RECUADRO OSCURO) */
+    .floors-grid {
+      display: grid; grid-template-columns: repeat(4, 85px); gap: 20px; 
+      pointer-events: auto; 
+      
+      /* Se eliminó el fondo, el borde y el blur de esta caja */
+      background: transparent;
+      border: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      padding: 0; 
+    }
+    
     .floor-btn {
-      width: 80px; height: 80px; 
-      border-radius: 50%; 
-      border: 1px solid var(--btn-border);
-      background: var(--btn-bg); 
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: var(--text);
-      font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 32px;
+      width: 85px; height: 85px; border-radius: 50%; border: 1px solid var(--btn-border);
+      background: var(--btn-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      color: var(--text); font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 36px;
       cursor: pointer; position: relative; overflow: hidden;
       transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
     .floor-btn:hover { background: rgba(10, 14, 26, 0.6); }
     .floor-btn:active { transform: scale(0.92); }
@@ -115,130 +141,158 @@
     .floor-btn .ripple { position: absolute; border-radius: 50%; background: rgba(0, 229, 255, 0.4); transform: scale(0); animation: rippleAnim 0.6s ease-out; pointer-events: none; }
     @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
 
-    /* BOTONES ESPECIALES */
-    .special-functions { display: flex; gap: 15px; pointer-events: auto; width: 100%; justify-content: center; margin-bottom: 10px; }
+    /* SECCIÓN DERECHA: Especiales y Logo */
+    .right-section {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      gap: 40px; width: 30%; pointer-events: auto;
+    }
+    .special-functions { display: flex; flex-direction: column; gap: 15px; width: 100%; align-items: center; }
     .special-btn {
-      display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 0;
+      display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; padding: 15px 20px;
       border-radius: 16px; border: 1px solid var(--btn-border); background: var(--btn-bg);
       backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       color: var(--text); font-family: 'Rajdhani', sans-serif;
-      font-size: 11px; letter-spacing: 1px; font-weight: 600; cursor: pointer;
+      font-size: 16px; letter-spacing: 2px; font-weight: 600; cursor: pointer;
       transition: transform 0.12s ease, background 0.2s ease;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      flex: 1; max-width: 90px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      width: 100%; max-width: 200px;
     }
-    .special-btn svg { width: 20px; height: 20px; color: var(--accent); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+    .special-btn svg { width: 24px; height: 24px; color: var(--accent); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
     .special-btn:hover { background: rgba(10, 14, 26, 0.6); }
     .special-btn:active { transform: scale(0.92); }
     .special-btn.alarm svg { color: var(--danger); }
 
-    /* --- LOGO INFERIOR DERECHO (TRIPLE DE TAMAÑO) --- */
-    .corporate-logo {
-      position: absolute;
-      bottom: -15px; /* Lo bajamos un poco para que parezca que "sale" de la pantalla */
-      right: -10px;  /* Lo pegamos más a la esquina */
-      width: 270px;  /* TRIPLE DE TAMAÑO (90px x 3) */
-      z-index: 20;
-      pointer-events: none; 
-      
-      /* Estilo de placa */
-      border-radius: 12px;
-      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.7);
-      object-fit: contain; 
+    .corporate-logo-container {
+      background: var(--btn-bg); backdrop-filter: blur(10px);
+      border: 1px solid var(--btn-border); border-radius: 16px;
+      padding: 10px 20px; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+      display: flex; justify-content: center; align-items: center; pointer-events: none; 
     }
+    .corporate-logo { width: 200px; height: auto; object-fit: contain; display: block; }
 
-    /* TOAST (Mensajes flotantes) */
+    /* TOAST */
     .toast {
       position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
       padding: 12px 24px; border-radius: 14px; background: rgba(10, 14, 26, 0.85);
       border: 1px solid var(--accent); color: var(--accent); font-family: 'Rajdhani', sans-serif;
-      font-weight: 600; letter-spacing: 2px; font-size: 13px; opacity: 0; pointer-events: none;
+      font-weight: 600; letter-spacing: 2px; font-size: 15px; opacity: 0; pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease; backdrop-filter: blur(10px); z-index: 100;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      text-align: center; width: max-content; max-width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); text-align: center; width: max-content; max-width: 90%;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* Si la pantalla real es vertical (Tótem/Raspberry), ocupa todo el espacio */
-    @media (orientation: portrait) {
-      .app-container { max-width: 100%; aspect-ratio: auto; box-shadow: none; }
-      .corporate-logo {
-        width: 300px; /* Un poco más grande si la pantalla es 100% vertical */
-        bottom: -10px;
-        right: -20px;
+    /* =========================================================
+       ADAPTACIÓN PARA CELULARES EN VERTICAL
+       ========================================================= */
+    @media (max-aspect-ratio: 1/1) {
+      .topbar { padding: 0 15px; height: 50px; }
+      .brand-name { font-size: 15px; }
+      
+      .panel {
+        flex-direction: column;
+        padding: 10px;
+        justify-content: space-evenly;
+        top: 50px;
       }
+
+      .floor-indicator { width: 100%; margin-top: 0; flex-direction: row; gap: 20px; }
+      .floor-indicator .label { display: none; }
+      .current-floor { font-size: 130px; }
+      .direction-container { margin-top: 0; height: 60px; }
+      .direction-arrow { width: 60px; height: 60px; }
+
+      .floors-grid { 
+        grid-template-columns: repeat(3, 75px); 
+        gap: 15px; 
+        width: 100%;
+        justify-content: center;
+      }
+      .floor-btn { width: 75px; height: 75px; font-size: 32px; }
+
+      .right-section { width: 100%; flex-direction: column; gap: 15px; }
+      .special-functions { flex-direction: row; justify-content: center; gap: 10px; }
+      .special-btn { padding: 10px 5px; font-size: 12px; flex-direction: column; max-width: 80px; gap: 5px; }
+      .special-btn svg { width: 20px; height: 20px; }
+      
+      .corporate-logo-container { padding: 8px 15px; }
+      .corporate-logo { width: 160px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Contenedor principal -->
   <div class="app-container">
-
-    <!-- Video -->
-    <video id="bg-video" autoplay muted loop playsinline>
-      <source src="video.mp4" type="video/mp4" />
+    
+    <video id="bg-video-1" class="bg-video active" autoplay muted playsinline>
+      <source src="video1.mp4" type="video/mp4" />
+    </video>
+    <video id="bg-video-2" class="bg-video" muted playsinline>
+      <source src="video2.mp4" type="video/mp4" />
     </video>
 
-    <!-- Barra superior -->
     <header class="topbar">
       <div class="brand">
         <span class="logo-dot"></span>
-        <span class="brand-name" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">AURORA</span>
+        <span class="brand-name">Bogamac Demo</span>
       </div>
       <div class="status">
         <span class="status-item"><span class="pulse"></span> ONLINE</span>
-        <span class="status-item" id="clock" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">--:--</span>
+        <span class="status-item" id="clock">--:--</span>
       </div>
     </header>
 
-    <!-- Panel de botones -->
     <main class="panel">
+      
       <section class="floor-indicator">
         <span class="label">PISO ACTUAL</span>
         <div class="current-floor" id="currentFloor">1</div>
-        <span class="direction" id="direction">▲ SUBIENDO</span>
+        <div class="direction-container">
+          <svg id="directionArrow" class="direction-arrow stopped" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+        </div>
       </section>
 
       <section class="floors-grid" id="floorsGrid"></section>
 
-      <section class="special-functions">
-        <button class="special-btn" data-action="open">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          <span>ABRIR</span>
-        </button>
-        <button class="special-btn" data-action="close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/></svg>
-          <span>CERRAR</span>
-        </button>
-        <button class="special-btn alarm" data-action="alarm">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span>ALARMA</span>
-        </button>
+      <section class="right-section">
+        <div class="special-functions">
+          <button class="special-btn" data-action="open">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>ABRIR</span>
+          </button>
+          <button class="special-btn" data-action="close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/></svg>
+            <span>CERRAR</span>
+          </button>
+          <button class="special-btn alarm" data-action="alarm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>ALARMA</span>
+          </button>
+        </div>
+
+        <div class="corporate-logo-container">
+          <img src="logo.png" alt="Logo Bogamac" class="corporate-logo" />
+        </div>
       </section>
+
     </main>
 
-    <!-- Logo en la esquina -->
-    <img src="logo.png" alt="Logo Bogamac" class="corporate-logo" />
-
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
-
   </div>
 
-  <!-- Lógica JavaScript -->
   <script>
     const FLOORS = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1];
     const FLOOR_LABELS = { 0: 'PB', '-1': 'S1' };
     const grid = document.getElementById('floorsGrid');
     const currentFloorEl = document.getElementById('currentFloor');
-    const directionEl = document.getElementById('direction');
+    const arrowEl = document.getElementById('directionArrow'); 
     const clockEl = document.getElementById('clock');
     const toastEl = document.getElementById('toast');
 
     let currentFloor = 1;
-    let direction = 'up';
+    let direction = 'stopped'; 
     let selectedFloors = new Set();
 
     FLOORS.forEach((floor) => {
@@ -258,6 +312,7 @@
       } else {
         selectedFloors.add(floor); btn.classList.add('selected'); showToast(`Piso ${labelFor(floor)} solicitado`);
       }
+      updateArrow(); 
     }
 
     document.querySelectorAll('.special-btn').forEach((btn) => {
@@ -271,8 +326,11 @@
     function createRipple(el, event) {
       const rect = el.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
-      const x = (event.clientX ?? rect.left + rect.width / 2) - rect.left - size / 2;
-      const y = (event.clientY ?? rect.top + rect.height / 2) - rect.top - size / 2;
+      const clientX = event.clientX ?? (event.touches ? event.touches[0].clientX : rect.left + rect.width / 2);
+      const clientY = event.clientY ?? (event.touches ? event.touches[0].clientY : rect.top + rect.height / 2);
+      const x = clientX - rect.left - size / 2;
+      const y = clientY - rect.top - size / 2;
+      
       const ripple = document.createElement('span');
       ripple.className = 'ripple';
       ripple.style.width = ripple.style.height = size + 'px';
@@ -297,25 +355,103 @@
     }
     updateClock(); setInterval(updateClock, 1000);
 
-    function simulateMovement() {
-      if (selectedFloors.size === 0) return;
+    function updateArrow() {
+      if (selectedFloors.size === 0) {
+        arrowEl.className.baseVal = 'direction-arrow stopped';
+        direction = 'stopped';
+        return;
+      }
       const targets = Array.from(selectedFloors).sort((a, b) => a - b);
-      const target = direction === 'up' ? targets[targets.length - 1] : targets[0];
+      let target = direction === 'up' ? targets[targets.length - 1] : targets[0];
+      if (direction === 'stopped') target = targets[0]; 
+
+      if (target > currentFloor) {
+        arrowEl.className.baseVal = 'direction-arrow up';
+        direction = 'up';
+      } else if (target < currentFloor) {
+        arrowEl.className.baseVal = 'direction-arrow down';
+        direction = 'down';
+      } else {
+        arrowEl.className.baseVal = 'direction-arrow stopped';
+        direction = 'stopped';
+      }
+    }
+
+    function animateFloorNumber() {
+      currentFloorEl.classList.remove('animate-drop');
+      void currentFloorEl.offsetWidth; 
+      currentFloorEl.classList.add('animate-drop');
+    }
+
+    function simulateMovement() {
+      if (selectedFloors.size === 0) {
+        if (direction !== 'stopped') {
+          direction = 'stopped';
+          updateArrow();
+        }
+        return;
+      }
+
+      const targets = Array.from(selectedFloors).sort((a, b) => a - b);
+      let target = direction === 'up' ? targets[targets.length - 1] : targets[0];
+      
       if (currentFloor === target) {
         selectedFloors.delete(target);
         const btn = document.querySelector(`.floor-btn[data-floor="${target}"]`);
         if (btn) btn.classList.remove('selected');
+        updateArrow(); 
         return;
       }
+
       const step = direction === 'up' ? 1 : -1;
       const nextFloor = currentFloor + step;
+
       if (nextFloor > target && direction === 'up') { direction = 'down'; }
       else if (nextFloor < target && direction === 'down') { direction = 'up'; }
+      
       currentFloor = nextFloor;
       currentFloorEl.textContent = labelFor(currentFloor);
-      directionEl.textContent = direction === 'up' ? '▲ SUBIENDO' : '▼ BAJANDO';
+      
+      animateFloorNumber();
+
+      if (direction === 'up') {
+        arrowEl.className.baseVal = 'direction-arrow up';
+      } else {
+        arrowEl.className.baseVal = 'direction-arrow down';
+      }
     }
+    
     setInterval(simulateMovement, 1500);
+
+    const video1 = document.getElementById('bg-video-1');
+    const video2 = document.getElementById('bg-video-2');
+    let isVideo1Playing = true;
+
+    function playNextVideo() {
+      if (isVideo1Playing) {
+        video2.currentTime = 0;
+        video2.play();
+        video2.classList.add('active');
+        video1.classList.remove('active');
+        setTimeout(() => video1.pause(), 1000);
+        isVideo1Playing = false;
+      } else {
+        video1.currentTime = 0;
+        video1.play();
+        video1.classList.add('active');
+        video2.classList.remove('active');
+        setTimeout(() => video2.pause(), 1000);
+        isVideo1Playing = true;
+      }
+    }
+
+    video1.addEventListener('ended', playNextVideo);
+    video2.addEventListener('ended', playNextVideo);
+
+    document.addEventListener('click', () => {
+      if (video1.paused && isVideo1Playing) video1.play();
+      if (video2.paused && !isVideo1Playing) video2.play();
+    }, { once: true });
   </script>
 </body>
 </html>
