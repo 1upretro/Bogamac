@@ -40,6 +40,41 @@
       background: #0A0E1A;
     }
 
+    /* --- PANTALLA DE CARGA --- */
+    #loader {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #0A0E1A;
+      z-index: 9999; /* Por encima de todo */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-spinner {
+      width: 60px; height: 60px;
+      border: 4px solid rgba(0, 229, 255, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    .loader-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      font-weight: 600;
+      animation: pulseText 1.5s infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    @keyframes pulseText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
     /* VIDEOS */
     .bg-video {
       position: absolute;
@@ -110,19 +145,11 @@
     @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(0deg); } }
     @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(180deg); } 50% { transform: translateY(15px) rotate(180deg); } }
 
-    /* SECCIÓN CENTRAL: Botones de pisos (SIN RECUADRO OSCURO) */
+    /* SECCIÓN CENTRAL: Botones de pisos */
     .floors-grid {
       display: grid; grid-template-columns: repeat(4, 85px); gap: 20px; 
-      pointer-events: auto; 
-      
-      /* Se eliminó el fondo, el borde y el blur de esta caja */
-      background: transparent;
-      border: none;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-      padding: 0; 
+      pointer-events: auto; padding: 0;
     }
-    
     .floor-btn {
       width: 85px; height: 85px; border-radius: 50%; border: 1px solid var(--btn-border);
       background: var(--btn-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -181,39 +208,22 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* =========================================================
-       ADAPTACIÓN PARA CELULARES EN VERTICAL
-       ========================================================= */
+    /* ADAPTACIÓN PARA CELULARES EN VERTICAL */
     @media (max-aspect-ratio: 1/1) {
       .topbar { padding: 0 15px; height: 50px; }
       .brand-name { font-size: 15px; }
-      
-      .panel {
-        flex-direction: column;
-        padding: 10px;
-        justify-content: space-evenly;
-        top: 50px;
-      }
-
+      .panel { flex-direction: column; padding: 10px; justify-content: space-evenly; top: 50px; }
       .floor-indicator { width: 100%; margin-top: 0; flex-direction: row; gap: 20px; }
       .floor-indicator .label { display: none; }
       .current-floor { font-size: 130px; }
       .direction-container { margin-top: 0; height: 60px; }
       .direction-arrow { width: 60px; height: 60px; }
-
-      .floors-grid { 
-        grid-template-columns: repeat(3, 75px); 
-        gap: 15px; 
-        width: 100%;
-        justify-content: center;
-      }
+      .floors-grid { grid-template-columns: repeat(3, 75px); gap: 15px; width: 100%; justify-content: center; }
       .floor-btn { width: 75px; height: 75px; font-size: 32px; }
-
       .right-section { width: 100%; flex-direction: column; gap: 15px; }
       .special-functions { flex-direction: row; justify-content: center; gap: 10px; }
       .special-btn { padding: 10px 5px; font-size: 12px; flex-direction: column; max-width: 80px; gap: 5px; }
       .special-btn svg { width: 20px; height: 20px; }
-      
       .corporate-logo-container { padding: 8px 15px; }
       .corporate-logo { width: 160px; }
     }
@@ -223,10 +233,17 @@
 
   <div class="app-container">
     
-    <video id="bg-video-1" class="bg-video active" autoplay muted playsinline>
+    <!-- PANTALLA DE CARGA -->
+    <div id="loader">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">CARGANDO SISTEMA</div>
+    </div>
+
+    <!-- VIDEOS (El primero tiene preload="auto") -->
+    <video id="bg-video-1" class="bg-video active" autoplay muted playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4" />
     </video>
-    <video id="bg-video-2" class="bg-video" muted playsinline>
+    <video id="bg-video-2" class="bg-video" muted playsinline preload="auto">
       <source src="video2.mp4" type="video/mp4" />
     </video>
 
@@ -283,6 +300,29 @@
   </div>
 
   <script>
+    // --- LÓGICA DE CARGA DE VIDEO ---
+    const loader = document.getElementById('loader');
+    const video1 = document.getElementById('bg-video-1');
+    const video2 = document.getElementById('bg-video-2');
+
+    // Función para quitar la pantalla de carga
+    function hideLoader() {
+      loader.classList.add('hidden');
+    }
+
+    // Si el video 1 ya tiene suficientes datos descargados (canplaythrough)
+    video1.addEventListener('canplaythrough', () => {
+      // Damos un pequeño retraso de 0.5s para que la transición se vea suave
+      setTimeout(hideLoader, 500); 
+    }, { once: true });
+
+    // Si el video falla por alguna razón, quitamos el loader igual para no bloquear la app
+    video1.addEventListener('error', () => {
+      hideLoader();
+    });
+
+
+    // --- RESTO DE LA LÓGICA DE LA BOTONERA ---
     const FLOORS = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1];
     const FLOOR_LABELS = { 0: 'PB', '-1': 'S1' };
     const grid = document.getElementById('floorsGrid');
@@ -423,8 +463,7 @@
     
     setInterval(simulateMovement, 1500);
 
-    const video1 = document.getElementById('bg-video-1');
-    const video2 = document.getElementById('bg-video-2');
+    // --- LÓGICA DE ROTACIÓN DE VIDEOS ---
     let isVideo1Playing = true;
 
     function playNextVideo() {
