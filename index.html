@@ -2,7 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  
+  <!-- Ocultar barra de direcciones en celular -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
   <title>Botonera Ascensor - Bogamac Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,7 +21,7 @@
       --accent-soft: rgba(0, 229, 255, 0.15);
       --text: #E8ECF1;
       --text-dim: rgba(232, 236, 241, 0.55);
-      --btn-bg: rgba(10, 14, 26, 0.45); 
+      --btn-bg: rgba(10, 14, 26, 0.75); 
       --btn-border: rgba(255, 255, 255, 0.25);
       --danger: #FF4D6D;
       --success: #00FFC6;
@@ -23,7 +29,7 @@
     
     html, body {
       width: 100%; height: 100%; overflow: hidden;
-      background: #000;
+      background: #000; /* Fondo negro para que se fusione con la barra del celular */
       color: var(--text);
       font-family: 'Space Grotesk', sans-serif;
       user-select: none; -webkit-tap-highlight-color: transparent;
@@ -93,6 +99,8 @@
       display: flex; justify-content: space-between; align-items: center;
       background: linear-gradient(to bottom, rgba(10,14,26,0.9), transparent);
       z-index: 10;
+      /* Añadido para celulares con notch (muesca) */
+      padding-top: env(safe-area-inset-top, 0); 
     }
     .brand { display: flex; align-items: center; gap: 10px; }
     .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
@@ -116,13 +124,27 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center; 
       pointer-events: auto; width: 30%;
     }
-    .floor-indicator .label { font-family: 'Rajdhani', sans-serif; font-size: 16px; letter-spacing: 6px; color: var(--text-dim); font-weight: 700; margin-bottom: -10px; }
+    .floor-indicator .label { font-family: 'Rajdhani', sans-serif; font-size: 16px; letter-spacing: 6px; color: var(--text-dim); font-weight: 700; margin-bottom: 5px; }
+    
+    .floor-display-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center; 
+      justify-content: center;
+      gap: 20px; 
+      height: 260px; 
+    }
+
     .current-floor { 
       font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 220px; 
-      line-height: 0.9; color: var(--accent); 
+      line-height: 0.8; color: var(--accent); 
       text-shadow: 0 0 40px rgba(0, 229, 255, 0.9), 0 6px 15px rgba(0,0,0,0.9); 
       transform-origin: center center; 
+      display: flex;
+      justify-content: flex-end;
+      min-width: 180px; 
     }
+    
     .animate-drop { animation: dropAndBounce 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
     @keyframes dropAndBounce {
       0% { transform: translateY(-500px) scale(1.1); opacity: 0; }
@@ -133,32 +155,49 @@
       90% { transform: translateY(0px) scale(1); }
       100% { transform: translateY(0px) scale(1); }
     }
-    .direction-container { height: 80px; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
+
+    .direction-container { 
+      width: 120px; 
+      height: 260px; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+    }
+    
     .direction-arrow {
-      width: 80px; height: 80px; color: var(--success); 
-      filter: drop-shadow(0 0 15px rgba(0, 255, 198, 0.8));
+      width: 110px; height: 110px; color: var(--accent); 
+      filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.9)); 
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
     }
-    .direction-arrow.up { transform: rotate(0deg); animation: bounceUp 1.2s infinite ease-in-out; }
-    .direction-arrow.down { transform: rotate(180deg); animation: bounceDown 1.2s infinite ease-in-out; }
-    .direction-arrow.stopped { animation: none; opacity: 0.15; filter: none; }
-    @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(0deg); } }
-    @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(180deg); } 50% { transform: translateY(15px) rotate(180deg); } }
+    
+    .direction-arrow.up { animation: bounceUp 1.2s infinite ease-in-out; }
+    .direction-arrow.down { animation: bounceDown 1.2s infinite ease-in-out; }
+    .direction-arrow.stopped { animation: none; opacity: 0.15; filter: none; transform: rotate(0deg); }
+    
+    @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-80px) rotate(0deg); } }
+    @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(180deg); } 50% { transform: translateY(80px) rotate(180deg); } }
 
     /* SECCIÓN CENTRAL: Botones de pisos */
     .floors-grid {
-      display: grid; grid-template-columns: repeat(4, 85px); gap: 20px; 
+      display: grid; grid-template-columns: repeat(4, 110px); gap: 25px; 
       pointer-events: auto; padding: 0;
     }
+    
     .floor-btn {
-      width: 85px; height: 85px; border-radius: 50%; border: 1px solid var(--btn-border);
-      background: var(--btn-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      color: var(--text); font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 36px;
+      width: 110px; height: 110px; border-radius: 50%; border: 1px solid var(--btn-border);
+      background: var(--btn-bg); 
+      color: var(--text); 
+      font-family: 'Rajdhani', sans-serif; 
+      font-weight: 700; 
+      font-size: 68px; 
+      line-height: 1; 
+      display: flex; justify-content: center; align-items: center;
       cursor: pointer; position: relative; overflow: hidden;
       transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
-    .floor-btn:hover { background: rgba(10, 14, 26, 0.6); }
+    
+    .floor-btn:hover { background: rgba(10, 14, 26, 0.85); }
     .floor-btn:active { transform: scale(0.92); }
     .floor-btn.selected {
       background: var(--accent-soft); border-color: var(--accent); color: var(--accent);
@@ -177,20 +216,19 @@
     .special-btn {
       display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; padding: 15px 20px;
       border-radius: 16px; border: 1px solid var(--btn-border); background: var(--btn-bg);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       color: var(--text); font-family: 'Rajdhani', sans-serif;
-      font-size: 16px; letter-spacing: 2px; font-weight: 600; cursor: pointer;
+      font-size: 18px; letter-spacing: 2px; font-weight: 600; cursor: pointer;
       transition: transform 0.12s ease, background 0.2s ease;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      width: 100%; max-width: 200px;
+      width: 100%; max-width: 220px;
     }
-    .special-btn svg { width: 24px; height: 24px; color: var(--accent); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
-    .special-btn:hover { background: rgba(10, 14, 26, 0.6); }
+    .special-btn svg { width: 28px; height: 28px; color: var(--accent); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+    .special-btn:hover { background: rgba(10, 14, 26, 0.85); }
     .special-btn:active { transform: scale(0.92); }
     .special-btn.alarm svg { color: var(--danger); }
 
     .corporate-logo-container {
-      background: var(--btn-bg); backdrop-filter: blur(10px);
+      background: var(--btn-bg);
       border: 1px solid var(--btn-border); border-radius: 16px;
       padding: 10px 20px; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
       display: flex; justify-content: center; align-items: center; pointer-events: none; 
@@ -202,19 +240,31 @@
       .topbar { padding: 0 15px; height: 50px; }
       .brand-name { font-size: 15px; }
       .panel { flex-direction: column; padding: 10px; justify-content: space-evenly; top: 50px; }
-      .floor-indicator { width: 100%; margin-top: 0; flex-direction: row; gap: 20px; }
+      .floor-indicator { width: 100%; margin-top: 0; }
       .floor-indicator .label { display: none; }
-      .current-floor { font-size: 130px; }
-      .direction-container { margin-top: 0; height: 60px; }
-      .direction-arrow { width: 60px; height: 60px; }
-      .floors-grid { grid-template-columns: repeat(3, 75px); gap: 15px; width: 100%; justify-content: center; }
-      .floor-btn { width: 75px; height: 75px; font-size: 32px; }
+      
+      .floor-display-row {
+        height: 160px;
+        gap: 15px;
+      }
+      
+      .current-floor { font-size: 130px; min-width: 100px; }
+      
+      .direction-container { width: 80px; height: 160px; }
+      .direction-arrow { width: 80px; height: 80px; }
+      
+      @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-50px) rotate(0deg); } }
+      @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(180deg); } 50% { transform: translateY(50px) rotate(180deg); } }
+      
+      .floors-grid { grid-template-columns: repeat(3, 95px); gap: 20px; width: 100%; justify-content: center; }
+      .floor-btn { width: 95px; height: 95px; font-size: 58px; }
+      
       .right-section { width: 100%; flex-direction: column; gap: 15px; }
-      .special-functions { flex-direction: row; justify-content: center; gap: 10px; }
-      .special-btn { padding: 10px 5px; font-size: 12px; flex-direction: column; max-width: 80px; gap: 5px; }
-      .special-btn svg { width: 20px; height: 20px; }
+      .special-functions { flex-direction: row; justify-content: center; gap: 15px; }
+      .special-btn { padding: 12px 10px; font-size: 14px; flex-direction: column; max-width: 95px; gap: 5px; }
+      .special-btn svg { width: 24px; height: 24px; }
       .corporate-logo-container { padding: 8px 15px; }
-      .corporate-logo { width: 160px; }
+      .corporate-logo { width: 180px; }
     }
   </style>
 </head>
@@ -251,23 +301,23 @@
       
       <section class="floor-indicator">
         <span class="label">PISO ACTUAL</span>
-        <div class="current-floor" id="currentFloor">1</div>
-        <div class="direction-container">
-          <svg id="directionArrow" class="direction-arrow stopped" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="19" x2="12" y2="5"></line>
-            <polyline points="5 12 12 5 19 12"></polyline>
-          </svg>
+        
+        <div class="floor-display-row">
+          <div class="current-floor" id="currentFloor">1</div>
+          <div class="direction-container">
+            <svg id="directionArrow" class="direction-arrow stopped" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+          </div>
         </div>
+        
       </section>
 
       <section class="floors-grid" id="floorsGrid"></section>
 
       <section class="right-section">
         <div class="special-functions">
-          <button class="special-btn" data-action="open">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>ABRIR</span>
-          </button>
           <button class="special-btn" data-action="close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/></svg>
             <span>CERRAR</span>
@@ -275,6 +325,10 @@
           <button class="special-btn alarm" data-action="alarm">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span>ALARMA</span>
+          </button>
+          <button class="special-btn" data-action="open">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>ABRIR</span>
           </button>
         </div>
 
@@ -330,7 +384,6 @@
     function onFloorClick(floor, btn, event) {
       createRipple(btn, event);
       
-      // Si ya está en ese piso, no hace nada
       if (floor === currentFloor) return; 
 
       if (selectedFloors.has(floor)) {
@@ -343,10 +396,9 @@
       updateArrow(); 
     }
 
-    // Los botones especiales ahora no muestran cartel, solo el efecto visual de presionar
     document.querySelectorAll('.special-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
-        // Se puede agregar lógica extra aquí a futuro
+        // Lógica extra futura
       });
     });
 
@@ -469,6 +521,18 @@
     document.addEventListener('click', () => {
       if (video1.paused && isVideo1Playing) video1.play();
       if (video2.paused && !isVideo1Playing) video2.play();
+    }, { once: true });
+
+    // --- LÓGICA PARA FORZAR PANTALLA COMPLETA EN MÓVILES ---
+    document.addEventListener('click', function() {
+      let docEl = document.documentElement;
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen();
+      } else if (docEl.webkitRequestFullscreen) { /* Safari iOS */
+        docEl.webkitRequestFullscreen();
+      } else if (docEl.msRequestFullscreen) { /* IE11 */
+        docEl.msRequestFullscreen();
+      }
     }, { once: true });
   </script>
 </body>
