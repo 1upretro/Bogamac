@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
   
-  <!-- Ocultar barra de direcciones en celular -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -46,7 +45,7 @@
       background: #0A0E1A;
     }
 
-    /* --- LÍNEAS CRT SUTILES (mejora tecnológica) --- */
+    /* --- LÍNEAS CRT SUTILES --- */
     .app-container::after {
       content: "";
       position: absolute;
@@ -124,7 +123,6 @@
       z-index: 10;
       padding-top: env(safe-area-inset-top, 0); 
     }
-    /* Línea de escaneo animada bajo la topbar (mejora tecnológica) */
     .topbar::after {
       content: "";
       position: absolute;
@@ -174,43 +172,56 @@
       height: 260px; 
     }
 
+    /* --- CONTENEDOR DEL NÚMERO (SIN RECORTE DE HALO) --- */
+    .floor-number-wrapper {
+      position: relative;
+      min-width: 180px; 
+      height: 260px;    
+      display: flex;
+      justify-content: flex-end; 
+      /* Hemos quitado overflow: hidden para que el halo no se corte */
+    }
+
     .current-floor { 
       font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 220px; 
       line-height: 0.8; color: var(--accent); 
+      /* La sombra del texto se encarga del brillo sin crear bordes */
       text-shadow: 0 0 40px rgba(0, 229, 255, 0.9), 0 6px 15px rgba(0,0,0,0.9); 
-      transform-origin: center center; 
-      display: flex;
-      justify-content: flex-end;
-      min-width: 180px; 
       position: relative;
       z-index: 1;
+      display: flex;
+      align-items: center;
+      /* Aseguramos que las animaciones no recorten el fondo */
+      will-change: transform, opacity;
     }
-    /* Halo pulsante detrás del número (mejora tecnológica) */
-    .current-floor::before {
-      content: "";
-      position: absolute;
-      inset: -25%;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,229,255,0.40) 0%, transparent 70%);
-      animation: haloPulse 2.5s ease-in-out infinite;
-      z-index: -1;
-      filter: blur(15px);
-      pointer-events: none;
-    }
-    @keyframes haloPulse {
-      0%, 100% { transform: scale(1); opacity: 0.6; }
-      50% { transform: scale(1.15); opacity: 1; }
-    }
+
+    /* --- ANIMACIONES (SENTIDO Y MAYOR DESPLAZAMIENTO) --- */
     
-    .animate-drop { animation: dropAndBounce 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-    @keyframes dropAndBounce {
-      0% { transform: translateY(-500px) scale(1.1); opacity: 0; }
-      30% { transform: translateY(0px) scale(1); opacity: 1; }
-      45% { transform: translateY(-30px) scale(1); }
-      60% { transform: translateY(0px) scale(1); }
-      75% { transform: translateY(-10px) scale(1); }
-      90% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(0px) scale(1); }
+    /* SUBIENDO: El actual cae hacia abajo, el nuevo entra desde arriba */
+    .animate-out-up { animation: slideOutDown 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards; }
+    .animate-in-up { animation: slideInDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+    /* BAJANDO: El actual sube hacia arriba, el nuevo entra desde abajo */
+    .animate-out-down { animation: slideOutUp 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards; }
+    .animate-in-down { animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+    /* KEYFRAMES CON MAYOR DESPLAZAMIENTO (450px) */
+    @keyframes slideOutDown {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(450px); opacity: 0; } 
+    }
+    @keyframes slideInDown {
+      0% { transform: translateY(-450px); opacity: 0; } 
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideOutUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-450px); opacity: 0; }
+    }
+    @keyframes slideInUp {
+      0% { transform: translateY(450px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
 
     .direction-container { 
@@ -221,7 +232,6 @@
       align-items: center; 
       position: relative;
     }
-    /* Halo pulsante detrás de la flecha activa (mejora tecnológica) */
     .direction-container:has(.direction-arrow.up)::before,
     .direction-container:has(.direction-arrow.down)::before {
       content: "";
@@ -239,40 +249,29 @@
       50% { transform: scale(1.3); opacity: 1; }
     }
     
-    /* --- NUEVA FLECHA (IMAGEN) --- */
+    /* --- FLECHA (IMAGEN) --- */
     .direction-arrow {
       width: 110px; 
       height: 110px; 
       object-fit: contain;
-      /* mix-blend-mode quita el fondo blanco de la imagen */
       mix-blend-mode: screen; 
       filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.8));
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
       position: relative;
       z-index: 1;
-      /* ROTACIÓN BASE: Como la imagen original apunta a la derecha, 
-         la rotamos -90 grados para que apunte hacia ARRIBA */
       transform: rotate(-90deg); 
     }
     
-    /* Mantenemos la rotación base al subir, y añadimos el rebote */
-    .direction-arrow.up { 
-      animation: bounceUp 1.2s infinite ease-in-out; 
-    }
-    /* Para bajar, rotamos 180 grados respecto a la base (es decir, apunta hacia abajo) */
-    .direction-arrow.down { 
-      animation: bounceDown 1.2s infinite ease-in-out; 
-    }
+    .direction-arrow.up { animation: bounceUp 1.2s infinite ease-in-out; }
+    .direction-arrow.down { animation: bounceDown 1.2s infinite ease-in-out; }
     
     .direction-arrow.stopped { 
       animation: none; 
       opacity: 0.15; 
       filter: grayscale(1); 
-      /* Mantiene la rotación base hacia arriba pero apagada */
       transform: rotate(-90deg); 
     }
     
-    /* Ajustamos los keyframes para que respeten la rotación base */
     @keyframes bounceUp { 
       0%, 100% { transform: translateY(0) rotate(-90deg); } 
       50% { transform: translateY(-80px) rotate(-90deg); } 
@@ -288,7 +287,6 @@
       pointer-events: auto; padding: 0;
       position: relative;
     }
-    /* Grid de circuito sutil detrás de los botones (mejora tecnológica) */
     .floors-grid::before {
       content: "";
       position: absolute;
@@ -326,7 +324,6 @@
       text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
       animation: btnGlow 1.8s ease-in-out infinite;
     }
-    /* Borde luminoso pulsante en botón seleccionado (mejora tecnológica) */
     @keyframes btnGlow {
       0%, 100% { box-shadow: 0 0 20px rgba(0,229,255,0.4), inset 0 0 15px rgba(0,229,255,0.15); }
       50% { box-shadow: 0 0 40px rgba(0,229,255,0.9), inset 0 0 30px rgba(0,229,255,0.35); }
@@ -370,24 +367,21 @@
       .floor-indicator { width: 100%; margin-top: 0; }
       .floor-indicator .label { display: none; }
       
-      .floor-display-row {
-        height: 160px;
-        gap: 15px;
-      }
-      
-      .current-floor { font-size: 130px; min-width: 100px; }
+      .floor-display-row { height: 160px; gap: 15px; }
+      .floor-number-wrapper { min-width: 100px; height: 160px; }
+      .current-floor { font-size: 130px; }
+
+      /* Ajuste de desplazamiento para móviles */
+      @keyframes slideOutDown { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(300px); opacity: 0; } }
+      @keyframes slideInDown { 0% { transform: translateY(-300px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+      @keyframes slideOutUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-300px); opacity: 0; } }
+      @keyframes slideInUp { 0% { transform: translateY(300px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
       
       .direction-container { width: 80px; height: 160px; }
       .direction-arrow { width: 80px; height: 80px; }
       
-      @keyframes bounceUp { 
-        0%, 100% { transform: translateY(0) rotate(-90deg); } 
-        50% { transform: translateY(-50px) rotate(-90deg); } 
-      }
-      @keyframes bounceDown { 
-        0%, 100% { transform: translateY(0) rotate(90deg); } 
-        50% { transform: translateY(50px) rotate(90deg); } 
-      }
+      @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(-90deg); } 50% { transform: translateY(-50px) rotate(-90deg); } }
+      @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(90deg); } 50% { transform: translateY(50px) rotate(90deg); } }
       
       .floors-grid { grid-template-columns: repeat(3, 95px); gap: 20px; width: 100%; justify-content: center; }
       .floor-btn { width: 95px; height: 95px; font-size: 58px; }
@@ -400,12 +394,8 @@
       .corporate-logo { width: 180px; }
     }
 
-    /* ACCESIBILIDAD: reducir animaciones si el usuario lo pide */
     @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
   </style>
 </head>
@@ -413,13 +403,11 @@
 
   <div class="app-container">
     
-    <!-- PANTALLA DE CARGA -->
     <div id="loader">
       <div class="loader-spinner"></div>
       <div class="loader-text">CARGANDO SISTEMA</div>
     </div>
 
-    <!-- VIDEOS -->
     <video id="bg-video-1" class="bg-video active" autoplay muted playsinline preload="auto">
       <source src="video1.mp4" type="video/mp4" />
     </video>
@@ -444,9 +432,11 @@
         <span class="label">PISO ACTUAL</span>
         
         <div class="floor-display-row">
-          <div class="current-floor" id="currentFloor">1</div>
+          <div class="floor-number-wrapper">
+            <div class="current-floor" id="currentFloor">1</div>
+          </div>
+          
           <div class="direction-container">
-            <!-- NUEVA IMAGEN DE FLECHA (Asegúrate de tener flecha.png en la misma carpeta) -->
             <img id="directionArrow" src="flecha.png" alt="Dirección" class="direction-arrow stopped" />
           </div>
         </div>
@@ -486,17 +476,10 @@
     const video1 = document.getElementById('bg-video-1');
     const video2 = document.getElementById('bg-video-2');
 
-    function hideLoader() {
-      loader.classList.add('hidden');
-    }
+    function hideLoader() { loader.classList.add('hidden'); }
 
-    video1.addEventListener('canplaythrough', () => {
-      setTimeout(hideLoader, 500); 
-    }, { once: true });
-
-    video1.addEventListener('error', () => {
-      hideLoader();
-    });
+    video1.addEventListener('canplaythrough', () => { setTimeout(hideLoader, 500); }, { once: true });
+    video1.addEventListener('error', () => { hideLoader(); });
 
 
     // --- LÓGICA DE LA BOTONERA ---
@@ -536,9 +519,7 @@
     }
 
     document.querySelectorAll('.special-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        // Lógica extra futura
-      });
+      btn.addEventListener('click', () => { /* Lógica extra futura */ });
     });
 
     function createRipple(el, event) {
@@ -587,10 +568,27 @@
       }
     }
 
-    function animateFloorNumber() {
-      currentFloorEl.classList.remove('animate-drop');
+    // --- NUEVA LÓGICA DE ANIMACIÓN DE PISO CON DIRECCIÓN ---
+    function animateFloorNumber(newFloorValue, isGoingUp) {
+      // 1. Limpiamos cualquier clase de animación anterior
+      currentFloorEl.classList.remove('animate-in-up', 'animate-out-up', 'animate-in-down', 'animate-out-down');
+      // Forzamos reflow para reiniciar la animación
       void currentFloorEl.offsetWidth; 
-      currentFloorEl.classList.add('animate-drop');
+      
+      // 2. Elegimos la clase de salida según la dirección
+      const outClass = isGoingUp ? 'animate-out-up' : 'animate-out-down';
+      currentFloorEl.classList.add(outClass);
+
+      // 3. Esperamos a que termine de salir (400ms) y actualizamos
+      setTimeout(() => {
+        currentFloorEl.textContent = newFloorValue;
+        
+        currentFloorEl.classList.remove(outClass);
+        
+        // 4. Elegimos la clase de entrada según la dirección
+        const inClass = isGoingUp ? 'animate-in-up' : 'animate-in-down';
+        currentFloorEl.classList.add(inClass);
+      }, 400); 
     }
 
     function simulateMovement() {
@@ -619,12 +617,15 @@
       if (nextFloor > target && direction === 'up') { direction = 'down'; }
       else if (nextFloor < target && direction === 'down') { direction = 'up'; }
       
-      currentFloor = nextFloor;
-      currentFloorEl.textContent = labelFor(currentFloor);
-      
-      animateFloorNumber();
+      // Guardamos si está subiendo o bajando antes de actualizar el piso
+      const isGoingUp = direction === 'up';
 
-      if (direction === 'up') {
+      currentFloor = nextFloor;
+      
+      // Llamamos a la animación pasando la dirección
+      animateFloorNumber(labelFor(currentFloor), isGoingUp);
+
+      if (isGoingUp) {
         arrowEl.className = 'direction-arrow up';
       } else {
         arrowEl.className = 'direction-arrow down';
@@ -638,17 +639,13 @@
 
     function playNextVideo() {
       if (isVideo1Playing) {
-        video2.currentTime = 0;
-        video2.play();
-        video2.classList.add('active');
-        video1.classList.remove('active');
+        video2.currentTime = 0; video2.play();
+        video2.classList.add('active'); video1.classList.remove('active');
         setTimeout(() => video1.pause(), 1000);
         isVideo1Playing = false;
       } else {
-        video1.currentTime = 0;
-        video1.play();
-        video1.classList.add('active');
-        video2.classList.remove('active');
+        video1.currentTime = 0; video1.play();
+        video1.classList.add('active'); video2.classList.remove('active');
         setTimeout(() => video2.pause(), 1000);
         isVideo1Playing = true;
       }
@@ -665,13 +662,9 @@
     // --- LÓGICA PARA FORZAR PANTALLA COMPLETA EN MÓVILES ---
     document.addEventListener('click', function() {
       let docEl = document.documentElement;
-      if (docEl.requestFullscreen) {
-        docEl.requestFullscreen();
-      } else if (docEl.webkitRequestFullscreen) { /* Safari iOS */
-        docEl.webkitRequestFullscreen();
-      } else if (docEl.msRequestFullscreen) { /* IE11 */
-        docEl.msRequestFullscreen();
-      }
+      if (docEl.requestFullscreen) { docEl.requestFullscreen(); } 
+      else if (docEl.webkitRequestFullscreen) { docEl.webkitRequestFullscreen(); } 
+      else if (docEl.msRequestFullscreen) { docEl.msRequestFullscreen(); }
     }, { once: true });
   </script>
 </body>
