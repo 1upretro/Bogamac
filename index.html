@@ -29,7 +29,7 @@
     
     html, body {
       width: 100%; height: 100%; overflow: hidden;
-      background: #000; /* Fondo negro para que se fusione con la barra del celular */
+      background: #000;
       color: var(--text);
       font-family: 'Space Grotesk', sans-serif;
       user-select: none; -webkit-tap-highlight-color: transparent;
@@ -44,6 +44,29 @@
       height: 100vh;
       overflow: hidden;
       background: #0A0E1A;
+    }
+
+    /* --- LÍNEAS CRT SUTILES (mejora tecnológica) --- */
+    .app-container::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 229, 255, 0.04) 0px,
+        rgba(0, 229, 255, 0.04) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: overlay;
+      animation: scanlines 8s linear infinite;
+      opacity: 0.5;
+    }
+    @keyframes scanlines {
+      from { background-position-y: 0; }
+      to { background-position-y: 100px; }
     }
 
     /* --- PANTALLA DE CARGA --- */
@@ -99,9 +122,25 @@
       display: flex; justify-content: space-between; align-items: center;
       background: linear-gradient(to bottom, rgba(10,14,26,0.9), transparent);
       z-index: 10;
-      /* Añadido para celulares con notch (muesca) */
       padding-top: env(safe-area-inset-top, 0); 
     }
+    /* Línea de escaneo animada bajo la topbar (mejora tecnológica) */
+    .topbar::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: scanBar 3s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes scanBar {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+
     .brand { display: flex; align-items: center; gap: 10px; }
     .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
     .brand-name { font-family: 'Rajdhani', sans-serif; font-weight: 600; letter-spacing: 2px; font-size: 18px; }
@@ -143,6 +182,24 @@
       display: flex;
       justify-content: flex-end;
       min-width: 180px; 
+      position: relative;
+      z-index: 1;
+    }
+    /* Halo pulsante detrás del número (mejora tecnológica) */
+    .current-floor::before {
+      content: "";
+      position: absolute;
+      inset: -25%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,229,255,0.40) 0%, transparent 70%);
+      animation: haloPulse 2.5s ease-in-out infinite;
+      z-index: -1;
+      filter: blur(15px);
+      pointer-events: none;
+    }
+    @keyframes haloPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.15); opacity: 1; }
     }
     
     .animate-drop { animation: dropAndBounce 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
@@ -162,12 +219,32 @@
       display: flex; 
       justify-content: center; 
       align-items: center; 
+      position: relative;
+    }
+    /* Halo pulsante detrás de la flecha activa (mejora tecnológica) */
+    .direction-container:has(.direction-arrow.up)::before,
+    .direction-container:has(.direction-arrow.down)::before {
+      content: "";
+      position: absolute;
+      inset: 15%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,229,255,0.35) 0%, transparent 70%);
+      animation: arrowPulse 1.2s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(10px);
+    }
+    @keyframes arrowPulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.3); opacity: 1; }
     }
     
     .direction-arrow {
       width: 110px; height: 110px; color: var(--accent); 
       filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.9)); 
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+      position: relative;
+      z-index: 1;
     }
     
     .direction-arrow.up { animation: bounceUp 1.2s infinite ease-in-out; }
@@ -181,6 +258,22 @@
     .floors-grid {
       display: grid; grid-template-columns: repeat(4, 110px); gap: 25px; 
       pointer-events: auto; padding: 0;
+      position: relative;
+    }
+    /* Grid de circuito sutil detrás de los botones (mejora tecnológica) */
+    .floors-grid::before {
+      content: "";
+      position: absolute;
+      inset: -25px;
+      background-image: 
+        linear-gradient(rgba(0,229,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      border-radius: 24px;
+      z-index: -1;
+      mask-image: radial-gradient(circle, black 40%, transparent 75%);
+      -webkit-mask-image: radial-gradient(circle, black 40%, transparent 75%);
+      pointer-events: none;
     }
     
     .floor-btn {
@@ -203,6 +296,12 @@
       background: var(--accent-soft); border-color: var(--accent); color: var(--accent);
       box-shadow: 0 0 24px rgba(0, 229, 255, 0.6), inset 0 0 20px rgba(0, 229, 255, 0.2);
       text-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+      animation: btnGlow 1.8s ease-in-out infinite;
+    }
+    /* Borde luminoso pulsante en botón seleccionado (mejora tecnológica) */
+    @keyframes btnGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,229,255,0.4), inset 0 0 15px rgba(0,229,255,0.15); }
+      50% { box-shadow: 0 0 40px rgba(0,229,255,0.9), inset 0 0 30px rgba(0,229,255,0.35); }
     }
     .floor-btn .ripple { position: absolute; border-radius: 50%; background: rgba(0, 229, 255, 0.4); transform: scale(0); animation: rippleAnim 0.6s ease-out; pointer-events: none; }
     @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
@@ -265,6 +364,14 @@
       .special-btn svg { width: 24px; height: 24px; }
       .corporate-logo-container { padding: 8px 15px; }
       .corporate-logo { width: 180px; }
+    }
+
+    /* ACCESIBILIDAD: reducir animaciones si el usuario lo pide */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
