@@ -239,20 +239,48 @@
       50% { transform: scale(1.3); opacity: 1; }
     }
     
+    /* --- NUEVA FLECHA (IMAGEN) --- */
     .direction-arrow {
-      width: 110px; height: 110px; color: var(--accent); 
-      filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.9)); 
+      width: 110px; 
+      height: 110px; 
+      object-fit: contain;
+      /* mix-blend-mode quita el fondo blanco de la imagen */
+      mix-blend-mode: screen; 
+      filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.8));
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
       position: relative;
       z-index: 1;
+      /* ROTACIÓN BASE: Como la imagen original apunta a la derecha, 
+         la rotamos -90 grados para que apunte hacia ARRIBA */
+      transform: rotate(-90deg); 
     }
     
-    .direction-arrow.up { animation: bounceUp 1.2s infinite ease-in-out; }
-    .direction-arrow.down { animation: bounceDown 1.2s infinite ease-in-out; }
-    .direction-arrow.stopped { animation: none; opacity: 0.15; filter: none; transform: rotate(0deg); }
+    /* Mantenemos la rotación base al subir, y añadimos el rebote */
+    .direction-arrow.up { 
+      animation: bounceUp 1.2s infinite ease-in-out; 
+    }
+    /* Para bajar, rotamos 180 grados respecto a la base (es decir, apunta hacia abajo) */
+    .direction-arrow.down { 
+      animation: bounceDown 1.2s infinite ease-in-out; 
+    }
     
-    @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-80px) rotate(0deg); } }
-    @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(180deg); } 50% { transform: translateY(80px) rotate(180deg); } }
+    .direction-arrow.stopped { 
+      animation: none; 
+      opacity: 0.15; 
+      filter: grayscale(1); 
+      /* Mantiene la rotación base hacia arriba pero apagada */
+      transform: rotate(-90deg); 
+    }
+    
+    /* Ajustamos los keyframes para que respeten la rotación base */
+    @keyframes bounceUp { 
+      0%, 100% { transform: translateY(0) rotate(-90deg); } 
+      50% { transform: translateY(-80px) rotate(-90deg); } 
+    }
+    @keyframes bounceDown { 
+      0%, 100% { transform: translateY(0) rotate(90deg); } 
+      50% { transform: translateY(80px) rotate(90deg); } 
+    }
 
     /* SECCIÓN CENTRAL: Botones de pisos */
     .floors-grid {
@@ -352,8 +380,14 @@
       .direction-container { width: 80px; height: 160px; }
       .direction-arrow { width: 80px; height: 80px; }
       
-      @keyframes bounceUp { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-50px) rotate(0deg); } }
-      @keyframes bounceDown { 0%, 100% { transform: translateY(0) rotate(180deg); } 50% { transform: translateY(50px) rotate(180deg); } }
+      @keyframes bounceUp { 
+        0%, 100% { transform: translateY(0) rotate(-90deg); } 
+        50% { transform: translateY(-50px) rotate(-90deg); } 
+      }
+      @keyframes bounceDown { 
+        0%, 100% { transform: translateY(0) rotate(90deg); } 
+        50% { transform: translateY(50px) rotate(90deg); } 
+      }
       
       .floors-grid { grid-template-columns: repeat(3, 95px); gap: 20px; width: 100%; justify-content: center; }
       .floor-btn { width: 95px; height: 95px; font-size: 58px; }
@@ -412,10 +446,8 @@
         <div class="floor-display-row">
           <div class="current-floor" id="currentFloor">1</div>
           <div class="direction-container">
-            <svg id="directionArrow" class="direction-arrow stopped" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="19" x2="12" y2="5"></line>
-              <polyline points="5 12 12 5 19 12"></polyline>
-            </svg>
+            <!-- NUEVA IMAGEN DE FLECHA (Asegúrate de tener flecha.png en la misma carpeta) -->
+            <img id="directionArrow" src="flecha.png" alt="Dirección" class="direction-arrow stopped" />
           </div>
         </div>
         
@@ -535,7 +567,7 @@
 
     function updateArrow() {
       if (selectedFloors.size === 0) {
-        arrowEl.className.baseVal = 'direction-arrow stopped';
+        arrowEl.className = 'direction-arrow stopped';
         direction = 'stopped';
         return;
       }
@@ -544,13 +576,13 @@
       if (direction === 'stopped') target = targets[0]; 
 
       if (target > currentFloor) {
-        arrowEl.className.baseVal = 'direction-arrow up';
+        arrowEl.className = 'direction-arrow up';
         direction = 'up';
       } else if (target < currentFloor) {
-        arrowEl.className.baseVal = 'direction-arrow down';
+        arrowEl.className = 'direction-arrow down';
         direction = 'down';
       } else {
-        arrowEl.className.baseVal = 'direction-arrow stopped';
+        arrowEl.className = 'direction-arrow stopped';
         direction = 'stopped';
       }
     }
@@ -593,9 +625,9 @@
       animateFloorNumber();
 
       if (direction === 'up') {
-        arrowEl.className.baseVal = 'direction-arrow up';
+        arrowEl.className = 'direction-arrow up';
       } else {
-        arrowEl.className.baseVal = 'direction-arrow down';
+        arrowEl.className = 'direction-arrow down';
       }
     }
     
